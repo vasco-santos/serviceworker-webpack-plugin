@@ -1,33 +1,30 @@
-// @flow weak
-/* eslint-env mocha */
+/* tslint:disable:no-unused-expression */
+import ServiceWorkerWebpackPlugin from './index';
 
-import { assert } from 'chai'
-import ServiceWorkerPlugin from './index'
-
-function trim(str) {
-  return str.replace(/^\s+|\s+$/, '')
+function trim(str: string) {
+  return str.replace(/^\s+|\s+$/, '');
 }
 
-const filename = 'sw.js'
+const filename = 'sw.js';
 
 describe('ServiceWorkerPlugin', () => {
   describe('options: filename', () => {
     it('should throw if trying to hash the filename', () => {
-      assert.throws(() => {
-        // eslint-disable-next-line no-new
-        new ServiceWorkerPlugin({
+      expect(() => {
+        // tslint-disable-next-line no-new
+        new ServiceWorkerWebpackPlugin({
           filename: 'sw-[hash:7].js',
-        })
-      }, /The name of the/)
-    })
-  })
+        });
+      }).toThrow();
+    });
+  });
 
   describe('options: includes', () => {
     it('should allow to have a white list parameter', () => {
-      const serviceWorkerPlugin = new ServiceWorkerPlugin({
+      const serviceWorkerPlugin = new ServiceWorkerWebpackPlugin({
         filename,
         includes: ['bar.*'],
-      })
+      });
 
       const compilation = {
         assets: {
@@ -40,7 +37,7 @@ describe('ServiceWorkerPlugin', () => {
         getStats: () => ({
           toJson: () => ({}),
         }),
-      }
+      };
 
       return serviceWorkerPlugin.handleEmit(
         compilation,
@@ -48,30 +45,29 @@ describe('ServiceWorkerPlugin', () => {
           options: {},
         },
         () => {
-          assert.strictEqual(
-            compilation.assets[filename].source(),
+          expect(compilation.assets[filename].source()).toEqual(
             trim(`
 var serviceWorkerOption = {
   "assets": [
     "/bar.js"
   ]
 };`)
-          )
+          );
         }
-      )
-    })
+      );
+    });
 
     describe('options: transformOptions', () => {
       it('should be used', () => {
-        const transformOptions = serviceWorkerOption => ({
+        const transformOptions = (serviceWorkerOption: any) => ({
           bar: 'foo',
           jsonStats: serviceWorkerOption.jsonStats,
-        })
+        });
 
-        const serviceWorkerPlugin = new ServiceWorkerPlugin({
+        const serviceWorkerPlugin = new ServiceWorkerWebpackPlugin({
           filename,
           transformOptions,
-        })
+        });
 
         const compilation = {
           assets: {
@@ -84,7 +80,7 @@ var serviceWorkerOption = {
               foo: 'bar',
             }),
           }),
-        }
+        };
 
         return serviceWorkerPlugin.handleEmit(
           compilation,
@@ -92,8 +88,7 @@ var serviceWorkerOption = {
             options: {},
           },
           () => {
-            assert.strictEqual(
-              compilation.assets[filename].source(),
+            expect(compilation.assets[filename].source()).toEqual(
               trim(`
 var serviceWorkerOption = {
   "bar": "foo",
@@ -101,10 +96,10 @@ var serviceWorkerOption = {
     "foo": "bar"
   }
 };`)
-            )
+            );
           }
-        )
-      })
-    })
-  })
-})
+        );
+      });
+    });
+  });
+});
