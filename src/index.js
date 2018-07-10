@@ -169,7 +169,7 @@ export default class ServiceWorkerPlugin {
     assets = validatePaths(assets, this.options)
 
     const minify = (compiler.options.plugins || []).some(plugin => {
-      return plugin instanceof webpack.optimize.UglifyJsPlugin
+      return plugin instanceof webpack.optimize.minimize
     })
 
     const serviceWorkerOption = this.options.transformOptions({
